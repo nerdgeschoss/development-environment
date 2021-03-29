@@ -1,0 +1,44 @@
+version: '3.4'
+
+services:
+  elasticsearch-2:
+    image: 'elasticsearch:2.3'
+    volumes:
+      - ./volumes/elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - '9202:9200'
+  postgres-9:
+    image: 'postgres:9.5'
+    ports:
+      - '5439:5432'
+    volumes:
+      - .psqlrc:/root/.psqlrc:ro
+      - ./volumes/postgres:/var/lib/postgresql-9/data
+      - ./log:/root/log:cached
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+  postgres-12:
+    image: "postgres:12.4"
+    command: postgres -c shared_preload_libraries=pg_stat_statements -c pg_stat_statements.track=all
+    ports:
+      - "54312:5432"
+    volumes:
+      - ./volumes/postgres:/var/lib/postgresql-12/data
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+  mysql-10:
+    image: 'bitnami/mariadb:10.3.18'
+    ports:
+      - '3306:3306'
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: recordsale
+      MARIADB_REPLICATION_MODE: master
+      MARIADB_REPLICATION_USER: repl_user
+      MARIADB_REPLICATION_PASSWORD: replica
+    volumes:
+      - ./volumes/mysql:/bitnami/mariadb/data
