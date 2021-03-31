@@ -4,16 +4,24 @@ services:
   elasticsearch-2:
     image: 'elasticsearch:2.3'
     volumes:
-      - ./volumes/elasticsearch:/usr/share/elasticsearch/data
+      - ./volumes/elasticsearch-2:/usr/share/elasticsearch/data
     ports:
       - '9202:9200'
+  elasticsearch-7:
+    image: 'elasticsearch:7.11.2'
+    volumes:
+      - ./volumes/elasticsearch-7:/usr/share/elasticsearch/data
+    ports:
+      - '9207:9200'
+    environment:
+      - discovery.type=single-node
   postgres-9:
     image: 'postgres:9.5'
     ports:
       - '5439:5432'
     volumes:
       - .psqlrc:/root/.psqlrc:ro
-      - ./volumes/postgres:/var/lib/postgresql-9/data
+      - ./volumes/postgres-9:/var/lib/postgresql-9/data
       - ./log:/root/log:cached
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
@@ -23,7 +31,7 @@ services:
     ports:
       - "54312:5432"
     volumes:
-      - ./volumes/postgres:/var/lib/postgresql-12/data
+      - ./volumes/postgres-12:/var/lib/postgresql-12/data
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
   redis:
@@ -41,4 +49,4 @@ services:
       MARIADB_REPLICATION_USER: repl_user
       MARIADB_REPLICATION_PASSWORD: replica
     volumes:
-      - ./volumes/mysql:/bitnami/mariadb/data
+      - ./volumes/mysql-10:/bitnami/mariadb/data
