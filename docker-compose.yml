@@ -21,7 +21,7 @@ services:
       - '5439:5432'
     volumes:
       - .psqlrc:/root/.psqlrc:ro
-      - ./volumes/postgres-9:/var/lib/postgresql-9/data
+      - ./volumes/postgres-9:/var/lib/postgresql/data
       - ./log:/root/log:cached
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
@@ -31,7 +31,7 @@ services:
     ports:
       - "54312:5432"
     volumes:
-      - ./volumes/postgres-12:/var/lib/postgresql-12/data
+      - ./volumes/postgres-12:/var/lib/postgresql/data
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
   redis:
