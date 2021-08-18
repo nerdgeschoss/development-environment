@@ -44,11 +44,21 @@ Then you will need to run this to install the ruby dependencies.
 
     bundle install
 
+### MySQL Troubleshooting
+
 During the bundle install you may face an error with mysql, in that case just follow the instructions on the error.
 
 To install MySQL:
 
     brew install mysql
+
+If `bundle install` fails with `ld: library not found for -lzstd`, follow the instructions of [this post](https://stackoverflow.com/a/67877734).
+
+### PostgreSQL (PSQL) Troubleshooting
+
+If `bundle install` fails for the GEM `pg`, install `postgresql`:
+
+    brew install postgresql
 
 
 ## docker-compose
@@ -61,6 +71,12 @@ Now to setup we development environment we use `docker-compose`.
 ## yarn
 
 Now to install the Javascript dependencies we use `yarn`.
+
+To install it:
+
+    npm install -g yarn
+
+To resolve dependencies of a project:
 
     yarn
 
