@@ -23,7 +23,7 @@ You can check your ruby version by typing this in your project folder:
 
  `rvm` will automatically check that so you don’t have to, if you want to know more about rvm visit [rvm.io](rvm.io).
 
-### Troubleshoot
+### Troubleshoot Macbook M1
 
 Some projects may run on older versions of ruby. If you encounter this issue when trying to install an older version with rvm (like 2.6.6):
 
