@@ -25,7 +25,7 @@ You can check your ruby version by typing this in your project folder:
 
 ### Troubleshoot M1 MacBook
 
-Some projects may run on older versions of ruby. If you encounter this issue when trying to install an older version with rvm (like 2.6.6):
+Some projects may run on older versions of Ruby. If you encounter this issue when trying to install an older version with `rvm` (like 2.6.6):
 
 ```
 Error running '__rvm_make -j8',
