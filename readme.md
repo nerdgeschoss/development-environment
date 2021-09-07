@@ -36,7 +36,7 @@ There has been an error while running make. Halting the installation.
 
 Try installing using this flag:
 
-`rvm install "ruby-2.6.3" --with-out-ext=fiddle`
+`rvm install "ruby-2.6.6" --with-out-ext=fiddle`
  
 
 ## Rails
