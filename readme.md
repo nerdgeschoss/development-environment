@@ -22,6 +22,21 @@ You can check your ruby version by typing this in your project folder:
     which ruby
 
  `rvm` will automatically check that so you don’t have to, if you want to know more about rvm visit [rvm.io](rvm.io).
+
+### Troubleshoot M1 MacBook
+
+Some projects may run on older versions of Ruby. If you encounter this issue when trying to install an older version with `rvm` (like 2.6.6):
+
+```
+Error running '__rvm_make -j8',
+please read /Users/leogonzalez/.rvm/log/1631006748_ruby-2.6.6/make.log
+
+There has been an error while running make. Halting the installation.
+```
+
+Try installing using this flag:
+
+`rvm install "ruby-2.6.6" --with-out-ext=fiddle`
  
 
 ## Rails
