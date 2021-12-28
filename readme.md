@@ -4,40 +4,23 @@ This project contains all dependencies and services required by other nerdgescho
 
     docker-compose up
 
-
 # Setting up a Rails Application
+
 Here we will go over how to setup rails for the first time on your machine.
 
 We will mostly follow Rails [Getting Started Guide](https://guides.rubyonrails.org/getting_started.html) with some changes.
 
+## rbenv
 
-## rvm
+First thing we need is a version manager for Ruby. We use rbenv at nerdgeschoss.
 
-First thing we need is the “Ruby Version Manager”, `rvm` is setting the Ruby version to the version defined in the `Gemfile`, this curl command will install it.
-
-    \curl -sSL https://get.rvm.io | bash
+    brew install rbenv
 
 You can check your ruby version by typing this in your project folder:
 
-    which ruby
+    ruby --version
 
- `rvm` will automatically check that so you don’t have to, if you want to know more about rvm visit [rvm.io](rvm.io).
-
-### Troubleshoot M1 MacBook
-
-Some projects may run on older versions of Ruby. If you encounter this issue when trying to install an older version with `rvm` (like 2.6.6):
-
-```
-Error running '__rvm_make -j8',
-please read /Users/leogonzalez/.rvm/log/1631006748_ruby-2.6.6/make.log
-
-There has been an error while running make. Halting the installation.
-```
-
-Try installing using this flag:
-
-`rvm install "ruby-2.6.6" --with-out-ext=fiddle`
- 
+If a version is not installed, you can add it by `rbenv install x.x.x`.
 
 ## Rails
 
@@ -49,7 +32,7 @@ Steps 3, 4 and 5 can be done in parallel.
 
 ## bundle
 
-Now we need to install the dependencies, for that we use `bundle`.
+Now we need to install the dependencies, for that we use `bundler` (newer versions of ruby already have this preinstalled).
 
 If this is your first time setting up a rails project you will need to install it.
 
@@ -75,13 +58,11 @@ If `bundle install` fails for the GEM `pg`, install `postgresql`:
 
     brew install postgresql
 
-
 ## docker-compose
 
 Now to setup we development environment we use `docker-compose`.
 
     docker-compose up
-
 
 ## yarn
 
@@ -94,7 +75,6 @@ To install it:
 To resolve dependencies of a project:
 
     yarn
-
 
 ## Database
 
@@ -113,7 +93,6 @@ Then we will seed our database with fake data for testing.
     rake db:seed
 
 If you are interested in finding out what is going on behind the scenes (because it’s doing a lot and you will feel like the process just hanged) you can use `tail log/development.log` to hook into and view the log file.
-
 
 ## Rails Server
 
@@ -137,7 +116,6 @@ Run a `webpack` dev server to make our javascript updates faster.
 
 With that in place you can start developing.
 
-
 # Feature Specific Installations:
 
 ## imagemagick
@@ -145,3 +123,11 @@ With that in place you can start developing.
 If the project deals with images, you will need to install the `imagemagick` native Mac libarary.
 
     brew install imagemagick
+
+# Creating a new Rails App
+
+Use the supplied application generator:
+
+```bash
+rails new YOUR_APP_NAME --database=postgresql --skip-jbuilder --skip-test --javascript=esbuild --skip-bundle --force --template=https://raw.githubusercontent.com/nerdgeschoss/development-environment/main/rails-template.rb
+```
