@@ -1,18 +1,18 @@
-version: '3.4'
+version: "3.4"
 
 services:
   elasticsearch-7:
-    image: 'elasticsearch:7.11.2'
+    image: "elasticsearch:7.11.2"
     volumes:
       - ./volumes/elasticsearch-7:/usr/share/elasticsearch/data
     ports:
-      - '9207:9200'
+      - "9207:9200"
     environment:
       - discovery.type=single-node
   postgres-9:
-    image: 'postgres:9.5'
+    image: "postgres:9.5"
     ports:
-      - '5439:5432'
+      - "5439:5432"
     volumes:
       - .psqlrc:/root/.psqlrc:ro
       - ./volumes/postgres-9:/var/lib/postgresql/data
@@ -28,14 +28,23 @@ services:
       - ./volumes/postgres-12:/var/lib/postgresql/data
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
+  postgres-13:
+    image: "postgres:13.5"
+    command: postgres -c shared_preload_libraries=pg_stat_statements -c pg_stat_statements.track=all
+    ports:
+      - "54313:5432"
+    volumes:
+      - ./volumes/postgres-13:/var/lib/postgresql/data
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
   redis:
     image: redis
     ports:
       - "6379:6379"
   mysql-10:
-    image: 'bitnami/mariadb:10.3.18'
+    image: "bitnami/mariadb:10.3.18"
     ports:
-      - '3306:3306'
+      - "3306:3306"
     environment:
       MARIADB_ROOT_PASSWORD: root
       MARIADB_DATABASE: recordsale
