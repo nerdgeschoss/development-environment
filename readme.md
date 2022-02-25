@@ -52,6 +52,25 @@ To install MySQL:
 
 If `bundle install` fails with `ld: library not found for -lzstd`, follow the instructions of [this post](https://stackoverflow.com/a/67877734).
 
+Alternatively, try:
+
+```bash
+ls -la $(which mysql)
+```
+
+That gives you where the `mysql` binary is, something like `/usr/local/bin/mysql -> ../Cellar/mysql/8.0.28/bin/mysql`,
+meaning that your `mysql` install is in `/usr/local/Cellar/mysql/8.0.28`.
+
+Use that path for the next command.
+
+```bash
+gem install mysql2 -v '0.5.3' -- \
+ --with-mysql-lib=/usr/local/Cellar/mysql/8.0.28/lib \
+ --with-mysql-dir=/usr/local/Cellar/mysql/8.0.28 \
+ --with-mysql-config=/usr/local/Cellar/mysql/8.0.28/bin/mysql_config \
+ --with-mysql-include=/usr/local/Cellar/mysql/8.0.28/include
+```
+
 ### PostgreSQL (PSQL) Troubleshooting
 
 If `bundle install` fails for the GEM `pg`, install `postgresql`:
