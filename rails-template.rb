@@ -1,5 +1,3 @@
-run "rm config/master.key"
-run "rm config/credentials.yml.enc"
 run "rm app/views/layouts/*.erb"
 
 file "Gemfile", <<~RUBY
@@ -7,7 +5,7 @@ file "Gemfile", <<~RUBY
   ruby File.read(".ruby-version").strip
 
   # Core
-  gem "rails", "7.0.0"
+  gem "rails", "7.0.3"
   gem "puma"
 
   # Database
@@ -70,12 +68,17 @@ file "Gemfile", <<~RUBY
   end
 RUBY
 
+initializer "config.rb", <<~RUBY
+  Config = Shimmer::Config.instance
+  Shimmer::Meta.app_name = "#{app_name}"
+RUBY
+
 file "config/database.yml", <<~YML
   default: &default
     adapter: postgresql
     encoding: unicode
     host: 127.0.0.1
-    port: 54312
+    port: 54313
     pool: <%= ENV["DB_POOL"] || ENV["RAILS_MAX_THREADS"] || 5 %>
     username: <%= ENV["PG_USER"] || "postgres" %>
     variables:
@@ -132,7 +135,7 @@ file "config/application.rb", <<~RUBY
   # you've limited to :test, :development, or :production.
   Bundler.require(*Rails.groups)
 
-  module TestApp
+  module #{app_name.classify}
     class Application < Rails::Application
       # Initialize configuration defaults for originally generated Rails version.
       config.load_defaults 7.0
@@ -141,9 +144,10 @@ file "config/application.rb", <<~RUBY
       config.middleware.use Shimmer::CloudflareProxy
 
       config.action_mailer.default_url_options = {host: ENV["HOST"]} if ENV["HOST"].present?
-      config.active_job.queue_adapter = :sidekiq
+      config.active_storage.variant_processor = :mini_magick
 
       config.assets.paths << Rails.root.join("node_modules")
+      ActiveRecord::Tasks::DatabaseTasks.fixtures_path = Rails.root.join("spec/fixtures")
     end
   end
 RUBY
@@ -220,13 +224,9 @@ TOML
 
 file ".env", <<~ENV
   REDIS_URL=redis://127.0.0.1:6379
-  AWS_S3_REGION=
-  AWS_S3_BUCKET=
-  AWS_ACCESS_KEY_ID=
-  AWS_SECRET_ACCESS_KEY=
 
   # ease development with this puma settings
-  WEB_CONCURRENCY=1
+  WEB_CONCURRENCY=0
   PUMA_WORKER_TIMEOUT=6000
   RAILS_MAX_THREADS=20
 ENV
@@ -276,8 +276,35 @@ JS
 file "Procfile", <<~PROC
   web: bundle exec puma -C config/puma.rb
   worker: bundle exec sidekiq -e production
-  release: DB_POOL=2 bundle exec rake db:migrate
+  release: DB_POOL=2 bundle exec rake db:migrate_if_tables
 PROC
+
+file "Procfile.dev", <<~PROC
+  web: bundle exec rails s -p ${PORT:-3000} -b 0.0.0.0
+  worker: DB_POOL=3 bundle exec sidekiq
+  js: yarn build --watch
+  livereload: yarn live
+PROC
+
+file "bin/dev", <<~BASH
+  #!/usr/bin/env bash
+
+  if command -v overmind &> /dev/null
+  then
+    overmind s -f Procfile.dev -p ${PORT:-3000} -P 10
+    exit
+  fi
+
+  if ! gem list --silent --installed foreman
+  then
+    echo "Installing foreman..."
+    gem install foreman
+  fi
+
+  foreman start -f Procfile.dev "$@"
+BASH
+
+run "chmod +x bin/dev"
 
 file "app/assets/fonts/.keep", ""
 
@@ -287,6 +314,17 @@ file "app/assets/config/manifest.js", <<~JS
   //= link_directory ../stylesheets .css
   //= link_tree ../builds
 JS
+
+file "config/sidekiq.yml", <<~YML
+  :concurrency: 3
+  :queues:
+    - dispatch
+    - default
+    - mailers
+    - low_priority
+    - active_storage_analysis
+    - active_storage_purge
+YML
 
 file "tsconfig.json", <<~JS
   {
@@ -321,7 +359,8 @@ file "package.json", <<~JS
       "lint:format": "prettier --list-different \\"app/**/*.{ts,scss,json}\\"",
       "build": "esbuild app/javascript/*.* --bundle --sourcemap --outdir=app/assets/builds",
       "bundle-size": "npx source-map-explorer app/assets/builds/application.js app/assets/builds/application.js.map --no-border-checks",
-      "start": "yarn build --watch"
+      "start": "yarn build --watch",
+      "live": "yarn livereload -e scss app/assets"
     },
     "license": "MIT"
   }
@@ -394,7 +433,7 @@ file ".github/workflows/ci.yml", <<~YML
 
       services:
         postgres:
-          image: postgres:12
+          image: postgres:13
           env:
             POSTGRES_USER: postgres
             POSTGRES_PASSWORD: postgres
@@ -444,10 +483,10 @@ YML
 initializer "i18n.rb", <<~RUBY
   # frozen_string_literal: true
 
-  I18n.default_locale = :en
   disabled_locales = ENV["DISABLED_LOCALES"].to_s.split(",").map(&:downcase).map(&:to_sym)
-  I18n.available_locales = [:en] - disabled_locales
   I18n.enforce_available_locales = true
+  I18n.available_locales = [:en] - disabled_locales
+  I18n.default_locale = I18n.available_locales.first
 
   Rails.application.configure do
     config.i18n.fallbacks = [:en] - disabled_locales
@@ -507,6 +546,8 @@ file "app/views/components/_head.html.slim", <<~SLIM
     / Assets
     = stylesheet_link_tag "application", media: "all", "data-turbo-track": "reload"
     = javascript_include_tag "application", "data-turbo-track": "reload", defer: true
+
+    = render_meta
 
     = yield :additional_head_tags if content_for? :additional_head_tags
 SLIM
@@ -614,7 +655,7 @@ file "spec/support/system/cuprite_setup.rb", <<~RUBY
         inspector: true,
         # Allow running Chrome in a headful mode by setting HEADLESS env
         # var to a falsey value
-        headless: !ENV["HEADLESS"].in?(["n", "0", "no", "false"])
+        headless: Config.headless?
       }
     )
   end
@@ -634,11 +675,39 @@ file "Guardfile", <<~RUBY
 
     # RSpec files
     rspec = dsl.rspec
-    watch(rspec.spec_helper) { rspec.spec_dir }
-    watch(rspec.spec_support) { rspec.spec_dir }
     watch(rspec.spec_files)
   end
 RUBY
+
+inject_into_file "config/environments/development.rb", before: /end$\s\z/ do
+  <<~RUBY
+    config.hosts = nil
+
+    config.action_mailer.delivery_method = :letter_opener
+    config.active_job.queue_adapter = :sidekiq
+  RUBY
+end
+
+inject_into_file "config/environments/test.rb", before: /end$\s\z/ do
+  <<~RUBY
+    config.active_job.queue_adapter = :test
+  RUBY
+end
+
+
+inject_into_file "config/environments/production.rb", before: /end$\s\z/ do
+  <<~RUBY
+    config.action_mailer.delivery_method = :smtp
+    config.action_mailer.smtp_settings = {
+      user_name: ENV["SMTP_USERNAME"],
+      password: ENV["SMTP_PASSWORD"],
+      address: ENV["SMTP_ADDRESS"],
+      port: 587,
+      authentication: :login,
+      enable_starttls_auto: true
+    }
+  RUBY
+end
 
 run "bundle"
 
@@ -648,7 +717,8 @@ run "echo !.keep >> .gitignore"
 run "echo app/assets/builds >> .gitignore"
 run "echo node_modules >> .gitignore"
 
-rails_command "stimulus:manifest:update"
-
 run "yarn add @hotwired/stimulus @hotwired/turbo-rails @nerdgeschoss/shimmer esbuild typescript"
-run "yarn add -D @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint eslint-config-prettier eslint-plugin-prettier prettier"
+run "yarn add -D @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint eslint-config-prettier eslint-plugin-prettier prettier livereload"
+
+rails_command "stimulus:manifest:update"
+run 'git commit -m "Initial Commit" --allow-empty'
