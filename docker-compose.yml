@@ -2,6 +2,7 @@ version: "3.4"
 
 services:
   elasticsearch-7:
+    restart: always
     image: "elasticsearch:7.11.2"
     volumes:
       - ./volumes/elasticsearch-7:/usr/share/elasticsearch/data
@@ -10,6 +11,7 @@ services:
     environment:
       - discovery.type=single-node
   postgres-9:
+    restart: always
     image: "postgres:9.5"
     ports:
       - "5439:5432"
@@ -20,6 +22,7 @@ services:
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
   postgres-12:
+    restart: always
     image: "postgres:12.4"
     command: postgres -c shared_preload_libraries=pg_stat_statements -c pg_stat_statements.track=all
     ports:
@@ -29,6 +32,7 @@ services:
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
   postgres-13:
+    restart: always
     image: "postgres:13.5"
     command: postgres -c shared_preload_libraries=pg_stat_statements -c pg_stat_statements.track=all
     ports:
@@ -38,6 +42,7 @@ services:
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
   postgres-15:
+    restart: always
     image: "postgres:15.1"
     command: postgres -c shared_preload_libraries=pg_stat_statements -c pg_stat_statements.track=all
     ports:
@@ -47,10 +52,12 @@ services:
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
   redis:
+    restart: always
     image: redis
     ports:
       - "6379:6379"
   mysql-10:
+    restart: always
     image: "bitnami/mariadb:10.3.18"
     ports:
       - "3306:3306"
