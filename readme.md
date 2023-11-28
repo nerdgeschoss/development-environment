@@ -22,9 +22,13 @@ Here we will go over how to setup rails for the first time on your machine.
 
 We will mostly follow Rails [Getting Started Guide](https://guides.rubyonrails.org/getting_started.html) with some changes.
 
-## rbenv
+## Manage versions of languages and runtime environment
 
-First thing we need is a version manager for Ruby. We use rbenv at nerdgeschoss.
+You can use `asdf` to manage multiple tools. Check out the [guide](https://asdf-vm.com/guide/getting-started.html) for more, or use distinct managers as described below.
+
+### rbenv
+
+`rbenv` is a version manager for Ruby.
 
     brew install rbenv
 
@@ -34,7 +38,7 @@ You can check your ruby version by typing this in your project folder:
 
 If a version is not installed, you can add it by `rbenv install x.x.x`.
 
-## node
+### node
 
 Make sure you have node installed. Use volta as your version manager, follow the steps as decribed in the [docs](https://docs.volta.sh/guide/).
 
