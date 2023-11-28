@@ -36,7 +36,7 @@ If a version is not installed, you can add it by `rbenv install x.x.x`.
 
 ## node
 
-Make sure you have node installed. In order to do that use a version manager of your choice, such as [nvm](https://github.com/nvm-sh/nvm) or [volta](https://volta.sh/).
+Make sure you have node installed. Use volta as your version manager, follow the steps as decribed in the [docs](https://docs.volta.sh/guide/).
 
 ## Rails
 
