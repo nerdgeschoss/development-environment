@@ -69,3 +69,9 @@ services:
       MARIADB_REPLICATION_PASSWORD: replica
     volumes:
       - ./volumes/mysql-10:/bitnami/mariadb/data
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ~/.config/gh:/root/.config/gh:cached
