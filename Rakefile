@@ -1,5 +1,7 @@
 task :push do
-  sh "docker build -t development-environment ."
-  sh "docker tag development-environment:latest ghcr.io/nerdgeschoss/nerdgeschoss/development-environment:latest"
-  sh "docker push ghcr.io/nerdgeschoss/nerdgeschoss/development-environment:latest"
+  tag = ENV["RUBY_VERSION"]
+  abort "please set RUBY_VERSION" unless tag
+  base = "mcr.microsoft.com/devcontainers/ruby:1-#{tag}-bullseye"
+  sh "docker build -t ghcr.io/nerdgeschoss/nerdgeschoss/development-environment:#{tag} --build-arg BASE_IMAGE=#{base} ."
+  sh "docker push ghcr.io/nerdgeschoss/nerdgeschoss/development-environment:#{tag}"
 end

@@ -1,4 +1,5 @@
-FROM mcr.microsoft.com/devcontainers/ruby:1-3.2-bullseye
+ARG BASE_IMAGE
+FROM $BASE_IMAGE
 
 # Prepare for Terraform
 RUN wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
