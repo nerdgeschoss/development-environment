@@ -51,6 +51,16 @@ services:
       - ./volumes/postgres-15:/var/lib/postgresql/data
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
+  postgres-16:
+    restart: always
+    image: "postgres:16.2"
+    command: postgres -c shared_preload_libraries=pg_stat_statements -c pg_stat_statements.track=all
+    ports:
+      - "54316:5432"
+    volumes:
+      - ./volumes/postgres-16:/var/lib/postgresql/data
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
   redis:
     restart: always
     image: redis
