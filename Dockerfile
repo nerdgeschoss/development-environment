@@ -25,10 +25,10 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv
 
 RUN curl -fsSL https://get.docker.com | sh
 
-RUN curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
-
 RUN . /usr/local/share/nvm/nvm.sh \
   && nvm install 18
+
+RUN npm install -g heroku
 
 RUN gem install rails pull-request
 
