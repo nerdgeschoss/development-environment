@@ -35,5 +35,3 @@ RUN npm install -g heroku
 RUN gem install rails pull-request
 
 RUN pip install weasyprint
-
-RUN npx playwright install-deps && npx playwright install chromium
