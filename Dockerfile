@@ -17,7 +17,7 @@ RUN echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg ma
 RUN apt-get update && \
   export DEBIAN_FRONTEND=noninteractive && \
   apt-get -y install --no-install-recommends \
-  software-properties-common terraform gh libvips42 postgresql-client-15 python3-pip watchman
+  software-properties-common terraform gh libvips42 postgresql-client-15 python3-pip watchman zsh
 
 # Install AWS CLI
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip" && \
@@ -37,3 +37,12 @@ RUN gem install rails pull-request
 RUN pip install weasyprint
 
 RUN npx playwright install-deps && npx playwright install chromium
+
+COPY devcontainer-load-profile.sh etc/profile.d
+
+ARG USERNAME=nerd
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
+RUN groupadd --gid $USER_GID $USERNAME \
+  && useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME
