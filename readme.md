@@ -2,6 +2,8 @@
 
 This project contains all dependencies and services required by other nerdgeschoss projects. To run all needed versions of PostgreSQL, MySQL, and other databases, run
 
+    docker-compose up
+
 # Setting up a Rails Application
 
 Here we will go over how to setup rails for the first time on your machine.
