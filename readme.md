@@ -2,20 +2,6 @@
 
 This project contains all dependencies and services required by other nerdgeschoss projects. To run all needed versions of PostgreSQL, MySQL, and other databases, run
 
-    docker compose up
-
-### Auto-Start Mode
-
-To have the environment start automatically when _Docker_ start, execute the following command once.
-
-    docker compose up -d
-
-This starts them in _detached mode_ which makes them run in the background and start (and re-start on failure) automatically.
-
-This is useful in a scenario where you don't want to have a terminal tab dedicated to it and you can then, after starting _Docker_, skip the whole _starting the environment manually_ step.
-
-When the content of the `docker-compose.yml` file change, you need to run the command again for _Docker_ to pick up the modifications and run the latest versions and configurations available.
-
 # Setting up a Rails Application
 
 Here we will go over how to setup rails for the first time on your machine.
