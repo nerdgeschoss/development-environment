@@ -61,11 +61,11 @@ services:
       - ./volumes/postgres-16:/var/lib/postgresql/data
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
-  redis:
+  redis-7:
     restart: always
-    image: redis
+    image: redis:7.4.0
     ports:
-      - "6379:6379"
+      - "63797:6379"
   mysql-10:
     restart: always
     image: "bitnami/mariadb:10.3.18"
