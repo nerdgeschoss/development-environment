@@ -70,7 +70,7 @@ services:
     restart: always
     image: "bitnami/mariadb:10.3.18"
     ports:
-      - "3306:3306"
+      - "33010:3306"
     environment:
       MARIADB_ROOT_PASSWORD: root
       MARIADB_DATABASE: recordsale
