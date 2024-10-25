@@ -1,5 +1,5 @@
-ARG BASE_IMAGE
-FROM $BASE_IMAGE
+ARG RUBY_VERSION
+FROM mcr.microsoft.com/devcontainers/ruby:1-$RUBY_VERSION-bullseye
 
 ARG NODE_VERSION
 
@@ -19,11 +19,18 @@ RUN apt-get update && \
   apt-get -y install --no-install-recommends \
   software-properties-common terraform gh libvips42 postgresql-client-15 python3-pip watchman
 
-# Install AWS CLI
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip" && \
-  unzip awscliv2.zip && \
-  ./aws/install && \
-  rm -rf awscliv2.zip aws
+# Install AWS CLI based on the architecture
+RUN if [ "$(dpkg --print-architecture)" = "arm64" ]; then \
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    ./aws/install && \
+    rm -rf awscliv2.zip aws; \
+  else \
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    ./aws/install && \
+    rm -rf awscliv2.zip aws; \
+  fi
 
 RUN curl -fsSL https://get.docker.com | sh
 
@@ -36,4 +43,4 @@ RUN gem install rails pull-request
 
 RUN pip install weasyprint
 
-RUN npx playwright install-deps && npx playwright install chromium
+RUN npx playwright install-deps

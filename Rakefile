@@ -2,13 +2,12 @@ require "json"
 require "dotenv/tasks"
 
 task :push do
-  tag = ENV["RUBY_VERSION"]
+  ruby = ENV["RUBY_VERSION"]
   node = ENV["NODE_VERSION"]
-  abort "please set RUBY_VERSION" unless tag
+  abort "please set RUBY_VERSION" unless ruby
   abort "please set NODE_VERSION" unless node
-  base = "mcr.microsoft.com/devcontainers/ruby:1-#{tag}-bullseye"
-  sh "docker build -t ghcr.io/nerdgeschoss/nerdgeschoss/development-environment:#{tag}-#{node} --build-arg BASE_IMAGE=#{base} --build-arg NODE_VERSION=#{node} ."
-  sh "docker push ghcr.io/nerdgeschoss/nerdgeschoss/development-environment:#{tag}-#{node}"
+  name = "ghcr.io/nerdgeschoss/nerdgeschoss/development-environment:#{ruby}-#{node}"
+  sh "docker build --pull --push -t #{name} --platform=linux/arm64,linux/amd64 --build-arg RUBY_VERSION=#{ruby} --build-arg NODE_VERSION=#{node} ."
 end
 
 Label = Struct.new(:id, :name, :color, :description, :alternative_names)
