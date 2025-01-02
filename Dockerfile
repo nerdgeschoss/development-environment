@@ -24,7 +24,10 @@ RUN if [ "$(dpkg --print-architecture)" = "arm64" ]; then \
     curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \
     ./aws/install && \
-    rm -rf awscliv2.zip aws; \
+    rm -rf awscliv2.zip aws && \
+    curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_arm64/session-manager-plugin.deb" -o "session-manager-plugin.deb" && \
+    dpkg -i session-manager-plugin.deb && \
+    rm session-manager-plugin.deb; \
   else \
     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \

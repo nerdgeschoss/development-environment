@@ -1,0 +1,10 @@
+services:
+  app:
+    image: ghcr.io/nerdgeschoss/nerdgeschoss/development-environment:3.3-22
+    volumes:
+      - ../..:/workspaces:cached
+      - ~/.aws:/root/.aws:cached
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ~/.config/gh:/root/.config/gh:cached
+
+    command: sleep infinity
