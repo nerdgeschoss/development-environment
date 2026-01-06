@@ -25,6 +25,7 @@ task update_labels: :dotenv do
     Label.new(name: "frontend", color: "1abc9c", description: "Requires a frontend developer.", alternative_names: []),
     Label.new(name: "needs assistance", color: "fbca04", description: "Assigned person on the issue needs help from another team member.", alternative_names: []),
     Label.new(name: "unplanned", color: "f39c12", description: "This task was not planned in a regular sprint and therefore is billed at a higher rate.", alternative_names: []),
+    Label.new(name: "critical", color: "d35400", description: "This task is critical and has to be executed before other tasks.", alternative_names: []),
     Label.new(name: "exploration", color: "eaf296", description: "This task is about exploring future features.", alternative_names: []),
     Label.new(name: "support", color: "8e44ad", description: "This task tracks supporting the customer in using the software.", alternative_names: []),
   ]
