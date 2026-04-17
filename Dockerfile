@@ -1,41 +1,43 @@
-ARG RUBY_VERSION
-FROM mcr.microsoft.com/devcontainers/ruby:1-$RUBY_VERSION-bullseye
+ARG RUBY_IMAGE
+FROM mcr.microsoft.com/devcontainers/${RUBY_IMAGE}
 
 ARG NODE_VERSION
 
 # Prepare for Terraform
-RUN wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
-RUN echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+RUN echo "deb [trusted=yes] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
 
-RUN wget -O- https://cli.github.com/packages/githubcli-archive-keyring.gpg | gpg --dearmor | sudo tee /usr/share/keyrings/githubcli-archive-keyring.gpg
-RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list
+RUN echo "deb [arch=$(dpkg --print-architecture) trusted=yes] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list
 
-RUN wget -O- https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-RUN echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/postgres.list
+RUN echo "deb [trusted=yes] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/postgres.list
 
 # Remove yarn apt source with expired signing key (yarn is available via corepack)
 RUN rm -f /etc/apt/sources.list.d/yarn.list
 
-# Install additional OS packages.
-RUN apt-get update && \
+# Install additional OS packages. Package names differ between Debian releases:
+# trixie dropped watchman and software-properties-common, and renamed libvips42 to libvips42t64.
+RUN if [ "$(lsb_release -cs)" = "trixie" ]; then \
+    PACKAGES="terraform gh libvips42t64 postgresql-client-15 python3-pip"; \
+  else \
+    PACKAGES="software-properties-common terraform gh libvips42 postgresql-client-15 python3-pip watchman"; \
+  fi && \
+  apt-get update && \
   export DEBIAN_FRONTEND=noninteractive && \
-  apt-get -y install --no-install-recommends \
-  software-properties-common terraform gh libvips42 postgresql-client-15 python3-pip watchman
+  apt-get -y install --no-install-recommends $PACKAGES
 
 # Install AWS CLI based on the architecture
 RUN if [ "$(dpkg --print-architecture)" = "arm64" ]; then \
-    curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip" && \
-    unzip awscliv2.zip && \
-    ./aws/install && \
-    rm -rf awscliv2.zip aws && \
-    curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_arm64/session-manager-plugin.deb" -o "session-manager-plugin.deb" && \
-    dpkg -i session-manager-plugin.deb && \
-    rm session-manager-plugin.deb; \
+  curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip" && \
+  unzip awscliv2.zip && \
+  ./aws/install && \
+  rm -rf awscliv2.zip aws && \
+  curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_arm64/session-manager-plugin.deb" -o "session-manager-plugin.deb" && \
+  dpkg -i session-manager-plugin.deb && \
+  rm session-manager-plugin.deb; \
   else \
-    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
-    unzip awscliv2.zip && \
-    ./aws/install && \
-    rm -rf awscliv2.zip aws; \
+  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+  unzip awscliv2.zip && \
+  ./aws/install && \
+  rm -rf awscliv2.zip aws; \
   fi
 
 RUN curl -fsSL https://get.docker.com | sh
@@ -53,6 +55,10 @@ RUN cd /opt/ngserver \
   && printf '#!/usr/bin/env bash\nexec /opt/ngserver/ngserver "$(pwd)" "$@"\n' > /usr/local/bin/ngserver \
   && chmod +x /usr/local/bin/ngserver
 
-RUN pip install weasyprint
+RUN if [ "$(lsb_release -cs)" = "trixie" ]; then \
+    pip install --break-system-packages weasyprint; \
+  else \
+    pip install weasyprint; \
+  fi
 
 RUN npx playwright install-deps

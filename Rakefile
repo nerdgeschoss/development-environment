@@ -3,11 +3,18 @@ require "dotenv/tasks"
 
 VENDOR_DIR = File.join(__dir__, "vendor/ngserver")
 
+RUBY_IMAGES = {
+  "3.3" => "ruby:1-3.3-bullseye",
+  "3.4" => "ruby:1-3.4-bullseye",
+  "4.0" => "ruby:4-trixie",
+}.freeze
+
 task :push do
   ruby = ENV["RUBY_VERSION"]
   node = ENV["NODE_VERSION"]
   abort "please set RUBY_VERSION" unless ruby
   abort "please set NODE_VERSION" unless node
+  ruby_image = RUBY_IMAGES[ruby] || abort("unsupported RUBY_VERSION #{ruby.inspect} (known: #{RUBY_IMAGES.keys.join(', ')})")
   name = "ghcr.io/nerdgeschoss/nerdgeschoss/development-environment:#{ruby}-#{node}"
 
   if Dir.exist?(VENDOR_DIR)
@@ -15,7 +22,7 @@ task :push do
   else
     sh "git clone --depth 1 git@github.com:nerdgeschoss/servers.git #{VENDOR_DIR}"
   end
-  sh "docker build --pull --push -t #{name} --platform=linux/arm64,linux/amd64 --build-arg RUBY_VERSION=#{ruby} --build-arg NODE_VERSION=#{node} ."
+  sh "docker build --pull --push -t #{name} --platform=linux/arm64,linux/amd64 --build-arg RUBY_IMAGE=#{ruby_image} --build-arg NODE_VERSION=#{node} ."
 end
 
 Label = Struct.new(:id, :name, :color, :description, :alternative_names)
