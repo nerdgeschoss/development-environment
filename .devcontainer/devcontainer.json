@@ -10,7 +10,8 @@
         "GitHub.copilot",
         "esbenp.prettier-vscode",
         "GitHub.vscode-github-actions",
-        "ms-azuretools.vscode-docker"
+        "ms-azuretools.vscode-docker",
+        "Anthropic.claude-code"
       ]
     }
   },

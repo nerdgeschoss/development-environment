@@ -4,6 +4,7 @@ services:
     volumes:
       - ../..:/workspaces:cached
       - ~/.aws:/root/.aws:cached
+      - ~/.ssh:/root/.ssh:cached
       - /var/run/docker.sock:/var/run/docker.sock
       - ~/.config/gh:/root/.config/gh:cached
 

@@ -47,6 +47,12 @@ RUN npm install -g heroku
 
 RUN gem install rails pull-request
 
+COPY vendor/ngserver /opt/ngserver
+RUN cd /opt/ngserver \
+  && bundle install \
+  && printf '#!/usr/bin/env bash\nexec /opt/ngserver/ngserver "$(pwd)" "$@"\n' > /usr/local/bin/ngserver \
+  && chmod +x /usr/local/bin/ngserver
+
 RUN pip install weasyprint
 
 RUN npx playwright install-deps

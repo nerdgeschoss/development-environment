@@ -1,12 +1,20 @@
 require "json"
 require "dotenv/tasks"
 
+VENDOR_DIR = File.join(__dir__, "vendor/ngserver")
+
 task :push do
   ruby = ENV["RUBY_VERSION"]
   node = ENV["NODE_VERSION"]
   abort "please set RUBY_VERSION" unless ruby
   abort "please set NODE_VERSION" unless node
   name = "ghcr.io/nerdgeschoss/nerdgeschoss/development-environment:#{ruby}-#{node}"
+
+  if Dir.exist?(VENDOR_DIR)
+    sh "git -C #{VENDOR_DIR} pull --ff-only"
+  else
+    sh "git clone --depth 1 git@github.com:nerdgeschoss/servers.git #{VENDOR_DIR}"
+  end
   sh "docker build --pull --push -t #{name} --platform=linux/arm64,linux/amd64 --build-arg RUBY_VERSION=#{ruby} --build-arg NODE_VERSION=#{node} ."
 end
 
