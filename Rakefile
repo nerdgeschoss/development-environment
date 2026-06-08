@@ -6,7 +6,7 @@ VENDOR_DIR = File.join(__dir__, "vendor/ngserver")
 RUBY_IMAGES = {
   "3.3" => "ruby:3.3-trixie",
   "3.4" => "ruby:3.4-trixie",
-  "4.0" => "ruby:4-trixie",
+  "4.0" => "ruby:4.0-trixie",
 }.freeze
 
 task :push do
