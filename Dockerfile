@@ -16,9 +16,9 @@ RUN rm -f /etc/apt/sources.list.d/yarn.list
 # Install additional OS packages. Package names differ between Debian releases:
 # trixie dropped watchman and software-properties-common, and renamed libvips42 to libvips42t64.
 RUN if [ "$(lsb_release -cs)" = "trixie" ]; then \
-    PACKAGES="terraform gh libvips42t64 postgresql-client-15 python3-pip"; \
+    PACKAGES="terraform gh libvips42t64 postgresql-client-17 python3-pip"; \
   else \
-    PACKAGES="software-properties-common terraform gh libvips42 postgresql-client-15 python3-pip watchman"; \
+    PACKAGES="software-properties-common terraform gh libvips42 postgresql-client-17 python3-pip watchman"; \
   fi && \
   apt-get update && \
   export DEBIAN_FRONTEND=noninteractive && \
