@@ -5,7 +5,7 @@ file "Gemfile", <<~RUBY
   ruby File.read(".ruby-version").strip
 
   # Core
-  gem "rails", "7.0.3"
+  gem "rails", "7.1.2"
   gem "puma"
 
   # Database
@@ -61,7 +61,6 @@ file "Gemfile", <<~RUBY
     gem "rb-fsevent"
     gem "letter_opener"
     gem "debug"
-    gem "pry-rails"
     gem "guard"
     gem "guard-rspec"
     gem "solargraph-standardrb"
