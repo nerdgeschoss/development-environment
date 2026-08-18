@@ -13,16 +13,10 @@ RUN echo "deb [trusted=yes] https://apt.postgresql.org/pub/repos/apt $(lsb_relea
 # Remove yarn apt source with expired signing key (yarn is available via corepack)
 RUN rm -f /etc/apt/sources.list.d/yarn.list
 
-# Install additional OS packages. Package names differ between Debian releases:
-# trixie dropped watchman and software-properties-common, and renamed libvips42 to libvips42t64.
-RUN if [ "$(lsb_release -cs)" = "trixie" ]; then \
-    PACKAGES="terraform gh libvips42t64 postgresql-client-17 python3-pip"; \
-  else \
-    PACKAGES="software-properties-common terraform gh libvips42 postgresql-client-17 python3-pip watchman"; \
-  fi && \
-  apt-get update && \
+# Install additional OS packages.
+RUN apt-get update && \
   export DEBIAN_FRONTEND=noninteractive && \
-  apt-get -y install --no-install-recommends $PACKAGES
+  apt-get -y install --no-install-recommends terraform gh libvips42t64 postgresql-client-17 python3-pip
 
 # Install AWS CLI based on the architecture
 RUN if [ "$(dpkg --print-architecture)" = "arm64" ]; then \
@@ -47,6 +41,8 @@ RUN . /usr/local/share/nvm/nvm.sh \
 
 RUN npm install -g heroku
 
+RUN corepack enable && corepack install -g yarn@^1
+
 RUN gem install rails pull-request
 
 COPY vendor/ngserver /opt/ngserver
@@ -55,10 +51,6 @@ RUN cd /opt/ngserver \
   && printf '#!/usr/bin/env bash\nexec /opt/ngserver/ngserver "$(pwd)" "$@"\n' > /usr/local/bin/ngserver \
   && chmod +x /usr/local/bin/ngserver
 
-RUN if [ "$(lsb_release -cs)" = "trixie" ]; then \
-    pip install --break-system-packages weasyprint; \
-  else \
-    pip install weasyprint; \
-  fi
+RUN pip install --break-system-packages weasyprint
 
 RUN npx playwright install-deps
