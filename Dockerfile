@@ -41,6 +41,8 @@ RUN . /usr/local/share/nvm/nvm.sh \
 
 RUN npm install -g heroku
 
+RUN corepack enable && corepack install -g yarn@^1
+
 RUN gem install rails pull-request
 
 COPY vendor/ngserver /opt/ngserver
