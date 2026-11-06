@@ -41,7 +41,8 @@ RUN . /usr/local/share/nvm/nvm.sh \
 
 RUN npm install -g heroku
 
-RUN corepack enable && corepack install -g yarn@^1
+# Node 25+ no longer bundles corepack
+RUN npm install -g corepack && corepack enable && corepack install -g yarn@^1
 
 RUN gem install rails pull-request
 
